@@ -14,21 +14,67 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 
 from sklearn.metrics import classification_report
-from sklearn.model_selection import GridSearchCV
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.multioutput import MultiOutputClassifier
 
+class MessageLengthExtractor(BaseEstimator, TransformerMixin):
+    def message_length(self, text):
+        '''
+        Returns the number of characters in text
+        '''
+        return len(text)
+    
+    def fit(self, x, y=None):
+        return self
+    
+    def transform(self, X):
+        X_msg_len = pd.Series(X).apply(self.message_length)
+        return (pd.DataFrame(X_msg_len))
+
+class StartingNounExtractor(BaseEstimator, TransformerMixin):
+    def starting_noun(self, text):
+        '''
+        Is there a sentence that starts with a Noun
+        '''
+        sentences= nltk.sent_tokenize(text)
+        for sentence in sentences:
+            parts_of_speech_tags = nltk.pos_tag(tokenize(sentence))
+            word_1, tag_1 = parts_of_speech_tags[0]
+            if(tag_1[:2]=='NN'):
+                return True
+        return False
+    
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        X_tagged = pd.Series(X).apply(self.starting_noun)
+        return(pd.DataFrame(X_tagged))
+
+class NumericalExtractor(BaseEstimator, TransformerMixin):
+    def has_numerical(self, text):
+        pos_tags = nltk.pos_tag(tokenize(text))
+        for word, tag in pos_tags:
+            if(tag[:3]=='NUM'): return True
+        return False
+    
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        X_tagged = pd.Series(X).apply(self.has_numerical)
+        return(pd.DataFrame(X_tagged))
+
 def load_data(database_filepath):
     engine = create_engine('sqlite:///{}'.format(database_filepath))
-    conn = sqlite3.connect(database_filepath)
-    df = pd.read_sql("SELECT * FROM {}".format(database_filepath), con=conn)
-    X= df.messages.values
+    df = pd.read_sql("SELECT * FROM disasterResponse", engine)
+    X= df.message.values
     Y = df.iloc[:,4:]
-    return X, Y
+    return X, Y, df.columns[4:]
 
 def tokenize(text):
     tokens = word_tokenize(text) #split each message into individual words

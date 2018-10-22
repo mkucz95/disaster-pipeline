@@ -7,12 +7,12 @@ from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
     # load messages and categories datasets
-    messages = pd.read_csv('messages.csv')
-    categories = pd.read_csv('categories.csv')
+    messages = pd.read_csv(messages_filepath)
+    categories = pd.read_csv(categories_filepath)
 
     #merge datasets
     df = pd.merge(messages, categories, on='id')
-    
+    return df
 
 def clean_data(df):
     # create a dataframe of the 36 individual category columns
@@ -39,13 +39,12 @@ def clean_data(df):
 
     #drop duplicate data
     if(df.duplicated().sum()>0):
-    df = df.drop_duplicates()
+        df = df.drop_duplicates()
     return df
 
 def save_data(df, database_filename):
-    engine = create_engine('sqlite:///{}'.format(database_filename)
-    df.to_sql(database_filename, engine, index=False)  
-
+    engine = create_engine('sqlite:///{}'.format(database_filename))
+    df.to_sql('disasterResponse', engine, index=False, if_exists='replace')  
 
 def main():
     if len(sys.argv) == 4:
