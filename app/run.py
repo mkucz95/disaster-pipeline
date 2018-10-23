@@ -106,6 +106,12 @@ def index():
        'tools', 'hospitals', 'shops', 'aid_centers', 'other_infrastructure']].mean()
     infrastructure_counts = df_infrastructure.values
     infrastructure_names = df_infrastructure.index
+    
+    df_weather = df[['weather_related', 'floods', 'storm', 'fire', 'earthquake', 'cold',
+       'other_weather']].mean()
+    weather_mean = df_weather
+    weather_names = df_weather.index
+    
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
@@ -195,14 +201,37 @@ def index():
             'layout': {
                 'title': 'Infrastructure Related Messages',
                 'yaxis': {
-                    'title': "Proportion",
-                    'showspikes':"true"
+                    'title': "% of all messages",
+                    'showspikes':"true",
+                    'tickformat': ',.0%',
+                     'range': '[0,1]'
                 },
                 'xaxis': {
                     'title': "Infrastructure Type",
                 },
             }
-        }
+        },
+        {
+            'data': [
+                Bar(
+                    x=weather_names,
+                    y=weather_mean
+                )
+                    ],
+
+            'layout': {
+                'title': 'Weather Related Messages',
+                'yaxis': {
+                    'title': "% of all messages",
+                    'showspikes':"true",
+                    'tickformat': ',.0%',
+                     'range': '[0,1]'
+                },
+                'xaxis': {
+                    'title': "Message Type",
+                },
+            }
+        }, 
     ]
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
