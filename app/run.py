@@ -91,6 +91,21 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
+    message_type = ['related', 'request', 'offer']
+    message_type_count = [df[x].value_counts().values for x in message_type]
+    message_type_index = [df[x].value_counts().index for x in message_type]
+    
+    most_rel_df = pd.DataFrame(df.iloc[:,4:].sum(), columns=['sum']).sort_values('sum', ascending=False).iloc[:18,:]
+    most_related = most_rel_df['sum'].values
+    most_related_names = most_rel_df.index
+    least_rel_df = pd.DataFrame(df.iloc[:,4:].sum(), columns=['sum']).sort_values('sum', ascending=False).iloc[18:,:]
+    least_related = least_rel_df['sum'].values
+    least_related_names = least_rel_df.index
+    
+    df_infrastructure = df[['infrastructure_related', 'transport', 'buildings', 'electricity',
+       'tools', 'hospitals', 'shops', 'aid_centers', 'other_infrastructure']].mean()
+    infrastructure_counts = df_infrastructure.values
+    infrastructure_names = df_infrastructure.index
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
@@ -115,37 +130,77 @@ def index():
         {
             'data': [
                 Bar(
-                    x=genre_names,
-                    y=genre_counts
+                    x=most_related_names,
+                    y=most_related
                 )
-            ],
+                    ],
 
             'layout': {
-                'title': 'Distribution of Message Genres',
+                'title': 'Most Common Messages',
                 'yaxis': {
-                    'title': "Count"
+                    'title': "Count",
+                    'showspikes':"true"
                 },
                 'xaxis': {
-                    'title': "Genre"
-                }
+                    'title': "Type",
+                },
             }
         },
         {
             'data': [
                 Bar(
-                    x=genre_names,
-                    y=genre_counts
+                    x=least_related_names,
+                    y=least_related
                 )
-            ],
+                    ],
 
             'layout': {
-                'title': 'Distribution of Message Genres',
+                'title': 'Least Common Messages',
                 'yaxis': {
-                    'title': "Count"
+                    'title': "Count",
+                    'showspikes':"true"
                 },
                 'xaxis': {
-                    'title': "Genre"
-                }
+                    'title': "Type",
+                },
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=most_related_names,
+                    y=most_related
+                )
+                    ],
+
+            'layout': {
+                'title': 'Most Common Messages',
+                'yaxis': {
+                    'title': "Count",
+                    'showspikes':"true"
+                },
+                'xaxis': {
+                    'title': "Type",
+                },
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=infrastructure_names,
+                    y=infrastructure_counts
+                )
+                    ],
+
+            'layout': {
+                'title': 'Infrastructure Related Messages',
+                'yaxis': {
+                    'title': "Proportion",
+                    'showspikes':"true"
+                },
+                'xaxis': {
+                    'title': "Infrastructure Type",
+                },
             }
         }
     ]
