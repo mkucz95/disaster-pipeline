@@ -1,5 +1,19 @@
 # Disaster Response Pipeline Project
-
+## Included Files
+data/
+	- DisasterResponse.db: the sqlite3 databse file that is output by ETL pipeline
+    - process_data.py: the python script that runs ETL file
+    
+models/
+	- ada_classifier.pkl: the pickled classifier that was trained and optimized for classifying the dataset messages
+    - train_classifier.py: the script that builds, trains, and saves the classifier.
+    
+app/
+	- run.py: the script that runs the flask app
+    - templates/
+    	- go.html
+        - master.html: the default page for the app
+        
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
 
