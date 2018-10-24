@@ -1,9 +1,10 @@
 import json
 import plotly
 import pandas as pd
-
-from nltk.stem import WordNetLemmatizer
+import nltk
+nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger'])
 from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
 
 from flask import Flask
 from flask import render_template, request, jsonify
@@ -95,6 +96,10 @@ def index():
     message_type_count = [df[x].value_counts().values for x in message_type]
     message_type_index = [df[x].value_counts().index for x in message_type]
     
+    df_requests_1 = df.groupby('request').sum().iloc[1,2:].sort_values(ascending=False)[:10]
+    request_type_count = df_requests_1.values
+    request_type_index = df_requests_1.index
+    
     most_rel_df = pd.DataFrame(df.iloc[:,4:].sum(), columns=['sum']).sort_values('sum', ascending=False).iloc[:18,:]
     most_related = most_rel_df['sum'].values
     most_related_names = most_rel_df.index
@@ -113,7 +118,6 @@ def index():
     weather_names = df_weather.index
     
     # create visuals
-    # TODO: Below is an example - modify to create your own visuals
     graphs = [
         {
             'data': [
@@ -130,6 +134,24 @@ def index():
                 },
                 'xaxis': {
                     'title': "Genre"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    x=request_type_index,
+                    y=request_type_count
+                )
+            ],
+
+            'layout': {
+                'title': 'Most Common Request Messages',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Type of Request"
                 }
             }
         },
@@ -159,7 +181,6 @@ def index():
                     y=least_related
                 )
                     ],
-
             'layout': {
                 'title': 'Least Common Messages',
                 'yaxis': {
@@ -203,8 +224,8 @@ def index():
                 'yaxis': {
                     'title': "% of all messages",
                     'showspikes':"true",
-                    'tickformat': ',.0%',
-                     'range': '[0,1]'
+                    'tickformat': ',.2%',
+                     'range': '[0,0.5]'
                 },
                 'xaxis': {
                     'title': "Infrastructure Type",
@@ -218,14 +239,13 @@ def index():
                     y=weather_mean
                 )
                     ],
-
             'layout': {
                 'title': 'Weather Related Messages',
                 'yaxis': {
                     'title': "% of all messages",
                     'showspikes':"true",
-                    'tickformat': ',.0%',
-                     'range': '[0,1]'
+                    'tickformat': ',.2%',
+                     'range': '[0,0.5]'
                 },
                 'xaxis': {
                     'title': "Message Type",

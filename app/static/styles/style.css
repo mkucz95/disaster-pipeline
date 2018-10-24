@@ -1,0 +1,64 @@
+nav{
+  border-top:.8rem solid #557A95;
+  margin:0;
+  background-color: #B1A296;
+  padding: 0 2.1rem;
+  padding-bottom: 1rem;
+}
+
+header{
+    padding:0 4rem;
+    border-top:solid .8rem #907163;
+    font-size: 1.3rem;
+    font-weight:200;
+    color:#2d205f;
+    display: inline-block;
+}
+
+#classifyMsg{margin-bottom:2rem;}
+
+h1, h2{line-height: 2;color:black;}
+h2{border-bottom:0.2rem solid #557A95;margin-bottom:0;font-weight:300;}
+h1{font-size: 1.4rem;font-weight:400;border-bottom:0.2rem solid darkblue;}
+
+nav>a{font-size: 2rem;font-weight:400;line-height:2;color:#fff;text-decoration:none;margin-right:2rem;}
+.js-plotly-plot{max-width:45%;display:inline-block}
+nav{font-family: Arial Black, Gadget, sans-serif;}
+
+footer ul {
+    list-style-type: none;
+    margin-top: .4rem;
+    overflow: hidden;
+    background-color: #B1A296;
+	border-top:.4rem solid #557A95;
+}
+
+footer li {float: left;}
+
+footer a{
+    display: block;
+    text-align: center;
+    padding: 0.5rem 2rem;
+    text-decoration: none;
+ 	color:white;
+}
+
+footer a:hover {background-color: #DCDCDC;}
+
+input, button{border-radius:0.2rem;}
+button{background-color:#5ace93; color:white}
+#result{font-size:1.5rem;font-weight:300;}
+
+.results ul {
+    margin: 0 auto;
+    text-align: center;
+}
+
+.results li {
+    display: inline-block;
+    vertical-align: top;
+	padding: 2rem;
+  	border-radius:1rem;
+}
+.success{background-color:#5ace93}
+.results h2{margin-bottom:1rem;}
