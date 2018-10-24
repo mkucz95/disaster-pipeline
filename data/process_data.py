@@ -6,6 +6,11 @@ import sqlite3
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+    '''
+    combines data from two files into one pandas DataFrame
+    Input: filepath to messages, filepath to categories
+    Output: dataframe with messages and their corresponding categories aligned
+    '''
     # load messages and categories datasets
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
@@ -15,6 +20,11 @@ def load_data(messages_filepath, categories_filepath):
     return df
 
 def clean_data(df):
+    '''
+    Cleans data frame into a format that is suitable for ML algorithms
+    Input: pandas DataFrame
+    Output: cleaned pandas DataFrame
+    '''
     # create a dataframe of the 36 individual category columns
     categories = df['categories'].str.split(pat=';', expand=True)
 
@@ -43,6 +53,10 @@ def clean_data(df):
     return df
 
 def save_data(df, database_filename):
+    '''
+    Save dataframe to SQL database
+    Input: DataFrame, database location
+    '''
     engine = create_engine('sqlite:///{}'.format(database_filename))
     df.to_sql('disasterResponse', engine, index=False, if_exists='replace')  
 

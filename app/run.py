@@ -24,9 +24,15 @@ class MessageLengthExtractor(BaseEstimator, TransformerMixin):
         return len(text)
     
     def fit(self, x, y=None):
+        '''
+         Overriding function from baseclass, fits the object
+        '''
         return self
     
     def transform(self, X):
+        '''
+         Overriding function from baseclass, transforms the object
+        '''
         X_msg_len = pd.Series(X).apply(self.message_length)
         return (pd.DataFrame(X_msg_len))
 
@@ -44,27 +50,45 @@ class StartingNounExtractor(BaseEstimator, TransformerMixin):
         return False
     
     def fit(self, X, y=None):
+        '''
+         Overriding function from baseclass, fits the object
+        '''
         return self
     
     def transform(self, X):
+        '''
+         Overriding function from baseclass, transforms the object
+        '''
         X_tagged = pd.Series(X).apply(self.starting_noun)
         return(pd.DataFrame(X_tagged))
 
 class NumericalExtractor(BaseEstimator, TransformerMixin):
     def has_numerical(self, text):
+        '''
+         returns whether the text contains a number in it
+        '''
         pos_tags = nltk.pos_tag(tokenize(text))
         for word, tag in pos_tags:
             if(tag[:3]=='NUM'): return True
         return False
     
     def fit(self, X, y=None):
+        '''
+         Overriding function from baseclass, fits the object
+        '''
         return self
     
     def transform(self, X):
+        '''
+         Overriding function from baseclass, transforms the object
+        '''
         X_tagged = pd.Series(X).apply(self.has_numerical)
         return(pd.DataFrame(X_tagged))
 
 def tokenize(text):
+    '''
+    returns the tokenization of the text, necessary for the custom classification of messages
+    '''
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
 

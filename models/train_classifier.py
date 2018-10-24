@@ -29,9 +29,15 @@ class MessageLengthExtractor(BaseEstimator, TransformerMixin):
         return len(text)
     
     def fit(self, x, y=None):
+        '''
+         Overriding function from baseclass, fits the object
+        '''
         return self
     
     def transform(self, X):
+        '''
+         Overriding function from baseclass, transforms the object
+        '''
         X_msg_len = pd.Series(X).apply(self.message_length)
         return (pd.DataFrame(X_msg_len))
 
@@ -49,27 +55,47 @@ class StartingNounExtractor(BaseEstimator, TransformerMixin):
         return False
     
     def fit(self, X, y=None):
+        '''
+         Overriding function from baseclass, fits the object
+        '''
         return self
     
     def transform(self, X):
+        '''
+         Overriding function from baseclass, transforms the object
+        '''
         X_tagged = pd.Series(X).apply(self.starting_noun)
         return(pd.DataFrame(X_tagged))
 
 class NumericalExtractor(BaseEstimator, TransformerMixin):
     def has_numerical(self, text):
+        '''
+         returns whether the text contains a number in it
+        '''
         pos_tags = nltk.pos_tag(tokenize(text))
         for word, tag in pos_tags:
             if(tag[:3]=='NUM'): return True
         return False
     
     def fit(self, X, y=None):
+        '''
+         Overriding function from baseclass, fits the object
+        '''
         return self
     
     def transform(self, X):
+        '''
+         Overriding function from baseclass, transforms the object
+        '''
         X_tagged = pd.Series(X).apply(self.has_numerical)
         return(pd.DataFrame(X_tagged))
 
 def load_data(database_filepath):
+    '''
+    Load data from SQL Database into pandas DataFrame object
+    Input: filepath to SQL database location
+    Output: X values, and Y values, as well as the column names
+    '''
     engine = create_engine('sqlite:///{}'.format(database_filepath))
     df = pd.read_sql("SELECT * FROM disasterResponse", engine)
     X= df.message.values
@@ -77,6 +103,12 @@ def load_data(database_filepath):
     return X, Y, df.columns[4:]
 
 def tokenize(text):
+    '''
+    Returns the tokenization of text. Splits the text into individual words and
+    then transforms each word into its root. The words are also cleaned of any punctuation
+    
+    Output:array of cleaned and tokenized words
+    '''
     tokens = word_tokenize(text) #split each message into individual words
     lemmatizer = WordNetLemmatizer()
     clean_tokens=[]
