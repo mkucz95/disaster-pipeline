@@ -120,14 +120,18 @@ def tokenize(text):
     return clean_tokens
 
 def build_model():
-    #get the matrix of counts for each word in messages
-    #do tfidf transformation which shows occurence in realtion to number of documents
-    #perform randomforest on multioutpit classifier
+    '''
+    Builds ML pipeline. 1. get the matrix of counts for each word in messages
+    2. do tfidf transformation which shows occurence in realtion to number of documents
+    3. perform adaboostclassifier on multioutput classifier
+    Contain the pipeline object within gridearch, so that the pipeline is optimized when being fit.
+    Output: GridSearch object
+    '''
     pipeline = Pipeline([
         ('features', FeatureUnion([
 
             ('textpipeline', Pipeline([
-                ('vect', CountVectorizer(tokenizer=tokenize, ngram_range=(1,2))),
+                ('vect', CountVectorizer(tokenizer=tokenize)),
                 ('tfidf', TfidfTransformer())
             ])),
 
@@ -137,15 +141,29 @@ def build_model():
         ])),
         ('clf', MultiOutputClassifier(AdaBoostClassifier()))
     ])
-    return pipeline
+    parameters = {
+        'features__textpipeline__vect__ngram_range': ((1, 1), (1, 2)),
+        'clf__estimator__n_estimators': [50, 100, 200],
+        'clf__estimator__learning_rate': [0.1, 0.5, 1]
+    }
+return GridSearchCV(pipeline, param_grid=parameters)
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''
+    Evaluation of model for each classification cateogry
+    Input: model object, X_test, Y_test, names of categories
+    Output: prints the classification report for each model and category
+    '''
     predictions = pd.DataFrame(model.predict(X_test), columns = y_test.columns)
     for col in category_names:
         print(col)
         print(classification_report(Y_test[col], predictions[col]))
         
 def save_model(model, model_filepath):
+    '''
+    Save a model to certain filepath
+    Input: model object, filepath
+    '''
     joblib.dump(model, model_filepath);
 
 def main():
