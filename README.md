@@ -34,6 +34,7 @@ To put this algorithm to action, I created a dashboard utilizing Flask. There ar
 		- `style.css`: custom styling for dashboard page
         
 ## Instructions:
+### Command Line & Local Host
 1. Run the following commands in the project's root directory to set up your database and model.
 
     - To run ETL pipeline that cleans data and stores in database
@@ -45,3 +46,7 @@ To put this algorithm to action, I created a dashboard utilizing Flask. There ar
     `python run.py`
 
 3. Go to http://0.0.0.0:3001/
+
+### Online Deployment
+Visit at: [https://disaster-pipeline.herokuapp.com/](https://disaster-pipeline.herokuapp.com/)
+Deployed using Heroku.
