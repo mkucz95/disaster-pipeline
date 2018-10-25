@@ -12,11 +12,8 @@ from plotly.graph_objs import Bar
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
 from sklearn.base import BaseEstimator, TransformerMixin
-<<<<<<< HEAD
 from sklearn.model_selection import GridSearchCV
-=======
 from sklearn.ensemble import AdaBoostClassifier
->>>>>>> 7ba6769289604942f7beccb07efa9406df4f965d
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.multioutput import MultiOutputClassifier
