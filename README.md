@@ -48,5 +48,4 @@ To put this algorithm to action, I created a dashboard utilizing Flask. There ar
 3. Go to http://0.0.0.0:3001/
 
 ### Online Deployment
-Visit at: [https://disaster-pipeline.herokuapp.com/](https://disaster-pipeline.herokuapp.com/)
-Deployed using Heroku.
+Working on next steps to deploy online
