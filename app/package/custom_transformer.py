@@ -4,6 +4,19 @@ from nltk.tag import pos_tag
 from nltk.stem import WordNetLemmatizer
 from sklearn.base import BaseEstimator, TransformerMixin
 
+def tokenize(text):
+    '''
+    returns the tokenization of the text, necessary for the custom classification of messages
+    '''
+    tokens = word_tokenize(text)
+    lemmatizer = WordNetLemmatizer()
+
+    clean_tokens = []
+    for tok in tokens:
+        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+        clean_tokens.append(clean_tok)
+    return clean_tokens
+
 class MessageLengthExtractor(BaseEstimator, TransformerMixin):
     def message_length(self, text):
         '''
@@ -72,16 +85,3 @@ class NumericalExtractor(BaseEstimator, TransformerMixin):
         '''
         X_tagged = pd.Series(X).apply(self.has_numerical)
         return(pd.DataFrame(X_tagged))
-
-def tokenize(text):
-    '''
-    returns the tokenization of the text, necessary for the custom classification of messages
-    '''
-    tokens = word_tokenize(text)
-    lemmatizer = WordNetLemmatizer()
-
-    clean_tokens = []
-    for tok in tokens:
-        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-        clean_tokens.append(clean_tok)
-    return clean_tokens
