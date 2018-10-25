@@ -1,3 +1,9 @@
+import nltk
+from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk.tag import pos_tag
+from nltk.stem import WordNetLemmatizer
+from sklearn.base import BaseEstimator, TransformerMixin
+
 class MessageLengthExtractor(BaseEstimator, TransformerMixin):
     def message_length(self, text):
         '''
