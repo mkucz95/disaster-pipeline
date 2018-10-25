@@ -3,11 +3,11 @@ import plotly
 import pandas as pd
 import nltk
 nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger'])
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk.tag import pos_tag
 from nltk.stem import WordNetLemmatizer
 
-from flask import Flask
-from flask import render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify
 from plotly.graph_objs import Bar
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
@@ -40,9 +40,9 @@ class StartingNounExtractor(BaseEstimator, TransformerMixin):
         '''
         Is there a sentence that starts with a Noun
         '''
-        sentences= nltk.sent_tokenize(text)
+        sentences= sent_tokenize(text)
         for sentence in sentences:
-            parts_of_speech_tags = nltk.pos_tag(tokenize(sentence))
+            parts_of_speech_tags = pos_tag(tokenize(sentence))
             word_1, tag_1 = parts_of_speech_tags[0]
             if(tag_1[:2]=='NN'):
                 return True
