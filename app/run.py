@@ -13,6 +13,10 @@ from sklearn.externals import joblib
 from sqlalchemy import create_engine
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import GridSearchCV
+<<<<<<< HEAD
+=======
+from sklearn.ensemble import AdaBoostClassifier
+>>>>>>> 1e20f426bc35d322e3db0d503fedf4a3a3206051
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.multioutput import MultiOutputClassifier
