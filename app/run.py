@@ -25,6 +25,7 @@ app = Flask(__name__)
 # load data
 engine = create_engine('sqlite:///app/DisasterResponse.db') #create engine for sql access
 df = pd.read_sql_table('disasterResponse', engine) #from table name
+categories= df.columns[4:]
 
 # load model
 model = joblib.load('app/classifier.pkl')
@@ -38,20 +39,18 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     genre_colors = random_colors(genre_names)
-    
-    message_type = ['related', 'request', 'offer']
-    
+        
     df_requests_1 = df.groupby('request').sum().iloc[1,2:].sort_values(ascending=False)[:10]
     request_type_count = df_requests_1.values
     request_type_index = df_requests_1.index
     request_colors = random_colors(request_type_index)
     
-    most_rel_df = pd.DataFrame(df.iloc[:,4:].sum(), columns=['sum']).sort_values('sum', ascending=False).iloc[:18,:]
+    most_rel_df = pd.DataFrame(df[categories].sum(), columns=['sum']).sort_values('sum', ascending=False).iloc[:18,:]
     most_related = most_rel_df['sum'].values
     most_related_names = most_rel_df.index
     mrn_colors = random_colors(most_related_names)
 
-    least_rel_df = pd.DataFrame(df.iloc[:,4:].sum(), columns=['sum']).sort_values('sum', ascending=False).iloc[18:,:]
+    least_rel_df = pd.DataFrame(df[categories].sum(), columns=['sum']).sort_values('sum', ascending=False).iloc[18:,:]
     least_related = least_rel_df['sum'].values
     least_related_names = least_rel_df.index
     lrn_colors = random_colors(least_related_names)
@@ -207,7 +206,7 @@ def go():
 
     # use model to predict classification for query
     classification_labels = model.predict([query])[0]
-    classification_results = dict(zip(df.columns[4:], classification_labels))
+    classification_results = dict(zip(categories, classification_labels))
 
     # This will render the go.html Please see that file. 
     return render_template(
