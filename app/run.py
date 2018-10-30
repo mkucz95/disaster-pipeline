@@ -21,14 +21,11 @@ from sklearn.multioutput import MultiOutputClassifier
 #import custom classes and function for model
 from package.custom_transformer import MessageLengthExtractor, StartingNounExtractor, NumericalExtractor, tokenize
 app = Flask(__name__)
-app.logger.info(tokenize)
 # load data
 engine = create_engine('sqlite:///DisasterResponse.db') #create engine for sql access
 df = pd.read_sql_table('disasterResponse', engine) #from table name
 categories= df.columns[4:]
 
-# load model
-model = joblib.load('classifier.pkl')
 def random_colors(array):
     return dict(color=['rgb({},{},{})'.format(randint(0,256), randint(0,256), randint(0,256)) for x in array])
 # index webpage displays cool visuals and receives user input text for model
@@ -219,4 +216,6 @@ def go():
  #   app.run(host='0.0.0.0', port=3001, debug=True)
 
 if __name__ == '__main__':
+    # load model
+    model = joblib.load('classifier.pkl')
     app.run()
