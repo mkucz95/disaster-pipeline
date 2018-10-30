@@ -3,143 +3,70 @@ import plotly
 import pandas as pd
 import nltk
 nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger'])
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk.tag import pos_tag
 from nltk.stem import WordNetLemmatizer
-
-from flask import Flask
-from flask import render_template, request, jsonify
-from plotly.graph_objs import Bar
+from random import randint
+from flask import Flask, render_template, request, jsonify
+from plotly.graph_objs import Bar, Histogram
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
-
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.pipeline import Pipeline, FeatureUnion
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.multioutput import MultiOutputClassifier
 
+#import custom classes and function for model
+from package.custom_transformer import MessageLengthExtractor, StartingNounExtractor, NumericalExtractor, tokenize
 app = Flask(__name__)
 
-class MessageLengthExtractor(BaseEstimator, TransformerMixin):
-    def message_length(self, text):
-        '''
-        Returns the number of characters in text
-        '''
-        return len(text)
-    
-    def fit(self, x, y=None):
-        '''
-         Overriding function from baseclass, fits the object
-        '''
-        return self
-    
-    def transform(self, X):
-        '''
-         Overriding function from baseclass, transforms the object
-        '''
-        X_msg_len = pd.Series(X).apply(self.message_length)
-        return (pd.DataFrame(X_msg_len))
-
-class StartingNounExtractor(BaseEstimator, TransformerMixin):
-    def starting_noun(self, text):
-        '''
-        Is there a sentence that starts with a Noun
-        '''
-        sentences= nltk.sent_tokenize(text)
-        for sentence in sentences:
-            parts_of_speech_tags = nltk.pos_tag(tokenize(sentence))
-            word_1, tag_1 = parts_of_speech_tags[0]
-            if(tag_1[:2]=='NN'):
-                return True
-        return False
-    
-    def fit(self, X, y=None):
-        '''
-         Overriding function from baseclass, fits the object
-        '''
-        return self
-    
-    def transform(self, X):
-        '''
-         Overriding function from baseclass, transforms the object
-        '''
-        X_tagged = pd.Series(X).apply(self.starting_noun)
-        return(pd.DataFrame(X_tagged))
-
-class NumericalExtractor(BaseEstimator, TransformerMixin):
-    def has_numerical(self, text):
-        '''
-         returns whether the text contains a number in it
-        '''
-        pos_tags = nltk.pos_tag(tokenize(text))
-        for word, tag in pos_tags:
-            if(tag[:3]=='NUM'): return True
-        return False
-    
-    def fit(self, X, y=None):
-        '''
-         Overriding function from baseclass, fits the object
-        '''
-        return self
-    
-    def transform(self, X):
-        '''
-         Overriding function from baseclass, transforms the object
-        '''
-        X_tagged = pd.Series(X).apply(self.has_numerical)
-        return(pd.DataFrame(X_tagged))
-
-def tokenize(text):
-    '''
-    returns the tokenization of the text, necessary for the custom classification of messages
-    '''
-    tokens = word_tokenize(text)
-    lemmatizer = WordNetLemmatizer()
-
-    clean_tokens = []
-    for tok in tokens:
-        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
-        clean_tokens.append(clean_tok)
-
-    return clean_tokens
-
 # load data
-engine = create_engine('sqlite:///data/DisasterResponse.db') #create engine for sql access
+engine = create_engine('sqlite:///app/DisasterResponse.db') #create engine for sql access
 df = pd.read_sql_table('disasterResponse', engine) #from table name
 
 # load model
-model = joblib.load("./models/classifier.pkl")
-
+model = joblib.load('app/classifier.pkl')
+def random_colors(array):
+    return dict(color=['rgb({},{},{})'.format(randint(0,256), randint(0,256), randint(0,256)) for x in array])
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
 @app.route('/index')
 def index():
-    
     # extract data needed for visuals
-    # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
+    genre_colors = random_colors(genre_names)
     
     message_type = ['related', 'request', 'offer']
-    message_type_count = [df[x].value_counts().values for x in message_type]
-    message_type_index = [df[x].value_counts().index for x in message_type]
     
     df_requests_1 = df.groupby('request').sum().iloc[1,2:].sort_values(ascending=False)[:10]
     request_type_count = df_requests_1.values
     request_type_index = df_requests_1.index
+    request_colors = random_colors(request_type_index)
     
     most_rel_df = pd.DataFrame(df.iloc[:,4:].sum(), columns=['sum']).sort_values('sum', ascending=False).iloc[:18,:]
     most_related = most_rel_df['sum'].values
     most_related_names = most_rel_df.index
+    mrn_colors = random_colors(most_related_names)
+
     least_rel_df = pd.DataFrame(df.iloc[:,4:].sum(), columns=['sum']).sort_values('sum', ascending=False).iloc[18:,:]
     least_related = least_rel_df['sum'].values
     least_related_names = least_rel_df.index
+    lrn_colors = random_colors(least_related_names)
     
     df_infrastructure = df[['infrastructure_related', 'transport', 'buildings', 'electricity',
        'tools', 'hospitals', 'shops', 'aid_centers', 'other_infrastructure']].mean()
     infrastructure_counts = df_infrastructure.values
     infrastructure_names = df_infrastructure.index
-    
+    infrastructure_colors = random_colors(infrastructure_names)
+
     df_weather = df[['weather_related', 'floods', 'storm', 'fire', 'earthquake', 'cold',
        'other_weather']].mean()
     weather_mean = df_weather
     weather_names = df_weather.index
+    weather_colors = random_colors(weather_names)
     
     # create visuals
     graphs = [
@@ -147,7 +74,8 @@ def index():
             'data': [
                 Bar(
                     x=genre_names,
-                    y=genre_counts
+                    y=genre_counts,
+                    marker=genre_colors
                 )
             ],
 
@@ -165,7 +93,8 @@ def index():
             'data': [
                 Bar(
                     x=request_type_index,
-                    y=request_type_count
+                    y=request_type_count,
+                    marker=request_colors
                 )
             ],
 
@@ -183,7 +112,8 @@ def index():
             'data': [
                 Bar(
                     x=most_related_names,
-                    y=most_related
+                    y=most_related,
+                    marker=mrn_colors
                 )
                     ],
 
@@ -202,7 +132,8 @@ def index():
             'data': [
                 Bar(
                     x=least_related_names,
-                    y=least_related
+                    y=least_related,
+                    marker=lrn_colors
                 )
                     ],
             'layout': {
@@ -219,27 +150,9 @@ def index():
         {
             'data': [
                 Bar(
-                    x=most_related_names,
-                    y=most_related
-                )
-                    ],
-
-            'layout': {
-                'title': 'Most Common Messages',
-                'yaxis': {
-                    'title': "Count",
-                    'showspikes':"true"
-                },
-                'xaxis': {
-                    'title': "Type",
-                },
-            }
-        },
-        {
-            'data': [
-                Bar(
                     x=infrastructure_names,
-                    y=infrastructure_counts
+                    y=infrastructure_counts,
+                    marker=infrastructure_colors
                 )
                     ],
 
@@ -260,7 +173,8 @@ def index():
             'data': [
                 Bar(
                     x=weather_names,
-                    y=weather_mean
+                    y=weather_mean,
+                    marker=weather_colors
                 )
                     ],
             'layout': {
