@@ -23,12 +23,12 @@ from package.custom_transformer import MessageLengthExtractor, StartingNounExtra
 app = Flask(__name__)
 
 # load data
-engine = create_engine('sqlite:///app/DisasterResponse.db') #create engine for sql access
+engine = create_engine('sqlite:///DisasterResponse.db') #create engine for sql access
 df = pd.read_sql_table('disasterResponse', engine) #from table name
 categories= df.columns[4:]
 
 # load model
-model = joblib.load('app/classifier.pkl')
+model = joblib.load('classifier.pkl')
 def random_colors(array):
     return dict(color=['rgb({},{},{})'.format(randint(0,256), randint(0,256), randint(0,256)) for x in array])
 # index webpage displays cool visuals and receives user input text for model
