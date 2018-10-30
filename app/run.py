@@ -21,7 +21,7 @@ from sklearn.multioutput import MultiOutputClassifier
 #import custom classes and function for model
 from package.custom_transformer import MessageLengthExtractor, StartingNounExtractor, NumericalExtractor, tokenize
 app = Flask(__name__)
-
+app.logger.info(tokenize)
 # load data
 engine = create_engine('sqlite:///DisasterResponse.db') #create engine for sql access
 df = pd.read_sql_table('disasterResponse', engine) #from table name
