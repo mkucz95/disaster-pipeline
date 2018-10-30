@@ -1,4 +1,5 @@
 import nltk
+import pandas as pd
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.tag import pos_tag
 from nltk.stem import WordNetLemmatizer
