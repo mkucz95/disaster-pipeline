@@ -17,6 +17,7 @@
       <p>Analyzing message data for disaster response</p>
 </header>
 </nav>
+<div class="main">
   <section id="classsifyMsg">
 	<h2>Classify Own Message</h2>
     <form action="/go" method="get">
@@ -32,6 +33,7 @@
     {% for id in ids %}
         <section id="{{id}}"></section>
     {% endfor %}
+</div>
 <footer>
   <ul>
     <li><a href="https://www.udacity.com/course/data-scientist-nanodegree--nd025">In Collaboration With Udacity</a></li>
