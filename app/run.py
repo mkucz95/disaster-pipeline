@@ -25,7 +25,7 @@ app = Flask(__name__)
 engine = create_engine('sqlite:///DisasterResponse.db') #create engine for sql access
 df = pd.read_sql_table('disasterResponse', engine) #from table name
 categories= df.columns[4:]
-
+model = None
 def random_colors(array):
     return dict(color=['rgb({},{},{})'.format(randint(0,256), randint(0,256), randint(0,256)) for x in array])
 # index webpage displays cool visuals and receives user input text for model
